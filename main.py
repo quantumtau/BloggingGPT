@@ -35,7 +35,7 @@ except KeyError:
 article_content = ""
 article_title = ""
 article_description = ""
-
+findings = ""
 def process_section(section, level=2):
     """
     Process a section or subsection of the article.
@@ -70,7 +70,11 @@ def process_json(json_string):
 
     data = json.loads(json_string)
     article_title = data['Title']
-    article_description = data['Description'] + f"""{findings}"""
+    if findings.strip():
+        article_description = data['Description'] + f"""{findings}"""
+    else:
+        article_description = data['Description']
+
 
     spinner.succeed('Finished parsing JSON')
 
@@ -93,15 +97,17 @@ def article():
     """
     Main function to generate the article.
     """
+    global findings
     title = input("Please enter the article title: ")
 
+    # RESEARCH
     research = input("Do you want me to research the internet? (y/n): ")
-    global findings
     if research == 'y':
         findings = "Incorporate the following info found on Google: " + search.go(title)
         print(colored("\n" + "################### RESEARCH FINDINGS ###################", "green", attrs=["bold"]))
         print(findings)
     elif research == 'n':
+        findings = ""
         pass
 
     # ARTICLE TYPE

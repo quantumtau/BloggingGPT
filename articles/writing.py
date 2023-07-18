@@ -24,6 +24,12 @@ except KeyError:
     sys.stderr.write("OpenAI key configuration failed.")
     exit(1)
 
+
+def find_conclusion(text, function_to_call):
+    if "In conclusion," in text:
+        print("Found In conclusion text. Removing...")
+        return function_to_call(text)
+    return text
 def in_conclusion_killer(text):
     ###THIS BLOODY THING###
     prompt = f"""Remove in conclusion text: {text}"""
@@ -76,7 +82,7 @@ Remember, your goal is to create an introduction that hooks the reader and sets 
         if content is not None:
             #print(content, end='')
             chunked_output += content
-    chunked_output = in_conclusion_killer(chunked_output)
+    chunked_output = find_conclusion(chunked_output, in_conclusion_killer)
     return chunked_output
 
 
@@ -156,7 +162,7 @@ Remember, your goal is to create a section body and subsection body that align w
             #print(content, end='')
             chunked_output += content
 
-    chunked_output = in_conclusion_killer(chunked_output)
+    chunked_output = find_conclusion(chunked_output, in_conclusion_killer)
     return chunked_output
 
 if __name__ == "__main__":

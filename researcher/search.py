@@ -20,7 +20,7 @@ cfg = Config()
 try:
     openai.api_key = cfg.openai_api_key
     browserless_api_key = cfg.browserless_api_key
-    openai_model = cfg.llm_model
+    openai_model = cfg.fast_llm_model
     serpapi_api_key = cfg.serpapi_api_key
 except KeyError:
     sys.stderr.write("OpenAI key configuration failed.")
