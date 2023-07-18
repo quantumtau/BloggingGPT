@@ -24,6 +24,29 @@ except KeyError:
     sys.stderr.write("OpenAI key configuration failed.")
     exit(1)
 
+def in_conclusion_killer(text):
+    ###THIS BLOODY THING###
+    prompt = f"""Remove in conclusion text: {text}"""
+    chunked_output = ""
+    for chunk in openai.ChatCompletion.create(
+            model=cfg.llm_model,
+            temperature=1,
+            stream=True,
+            messages=[
+                {'role': 'system', 'content': 'You are a helpful assistant.'},
+                {'role': 'system', 'content': "You're an expert in blogging, research and SEO."},
+                {'role': 'system', 'content': 'Your name is BloggingGPT.'},
+                {'role': 'system', 'content': 'Content you write is well SEO Optimised.'},
+                {'role': 'system', 'content': 'You use engaging tone of voice.'},
+                {"role": "user", "content": prompt}
+            ]
+    ):
+        content = chunk["choices"][0].get("delta", {}).get("content")
+        if content is not None:
+            # print(content, end='')
+            chunked_output += content
+
+    return chunked_output
 def write_intro(title):
 
     prompt = f"""
@@ -53,7 +76,7 @@ Remember, your goal is to create an introduction that hooks the reader and sets 
         if content is not None:
             #print(content, end='')
             chunked_output += content
-
+    chunked_output = in_conclusion_killer(chunked_output)
     return chunked_output
 
 
@@ -69,6 +92,7 @@ You will not include any concluding summaries.
 You will not include section headings.
 You will be provided with an article title {title}, an article description {article_description}, a section heading {heading}, and a section description {heading_description}.
 Using these inputs, generate captivating, grammatically correct, and easy-to-read content that is suitable for the respective section.
+Make important parts of the text bold. You can also use quotes and citations.
 The content should engage readers and facilitate their understanding of the blog post's content. Maintain an engaging tone of voice throughout.
 The content should be ready to be copied and pasted directly into Wordpress, without the need for any additional formatting.
 Remember, your goal is to create a section body that aligns with the provided inputs and is optimized for search engines."""
@@ -91,6 +115,7 @@ Remember, your goal is to create a section body that aligns with the provided in
             #print(content, end='')
             chunked_output += content
 
+    chunked_output = in_conclusion_killer(chunked_output)
     return chunked_output
 
 def write_subsection(title, article_description, heading, heading_description, subheading, subheading_description,):
@@ -107,6 +132,7 @@ You will not include any concluding summaries.
 You will not include section or subsections headings.
 You will be provided with an article title {title}, an article description {article_description}, a section heading {heading}, a section description {heading_description}, a subsection heading {subheading}, and a subsection description {subheading_description}.
 Using these inputs, generate captivating, grammatically correct, and easy-to-read content that is suitable for the respective section and subsection.
+Make important parts of the text bold. You can also use quotes and citations.
 The content should engage readers and facilitate their understanding of the blog post's content. Maintain an engaging tone of voice throughout.
 The content should be ready to be copied and pasted directly into Wordpress, without the need for any additional formatting.
 Remember, your goal is to create a section body and subsection body that align with the provided inputs and are optimized for search engines."""
@@ -130,6 +156,7 @@ Remember, your goal is to create a section body and subsection body that align w
             #print(content, end='')
             chunked_output += content
 
+    chunked_output = in_conclusion_killer(chunked_output)
     return chunked_output
 
 if __name__ == "__main__":

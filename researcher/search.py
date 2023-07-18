@@ -7,6 +7,7 @@ from serpapi import GoogleSearch
 from dotenv import load_dotenv
 from termcolor import colored
 from tqdm import tqdm
+import concurrent.futures
 import colorama
 colorama.init(autoreset=True)
 from config import Config
@@ -19,7 +20,7 @@ cfg = Config()
 try:
     openai.api_key = cfg.openai_api_key
     browserless_api_key = cfg.browserless_api_key
-    llm_model = cfg.llm_model
+    openai_model = cfg.llm_model
     serpapi_api_key = cfg.serpapi_api_key
 except KeyError:
     sys.stderr.write("OpenAI key configuration failed.")
@@ -54,16 +55,22 @@ def summarize(question, webpage_text):
 
   Relevant information:"""
 
-    response = openai.ChatCompletion.create(
-        model=llm_model,
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt},
-        ]
-    )
-
-    return response.choices[0].message.content
-
+    while True:
+        try:
+            response = openai.ChatCompletion.create(
+                model=openai_model,
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": prompt},
+                ]
+            )
+            return response.choices[0].message.content
+        except openai.error.RateLimitError:
+            print("Rate limit exceeded. Sleeping for 3 seconds.")
+            time.sleep(3)
+        except openai.error.ServiceUnavailableError:
+            print("Service unavailable. Retrying in 5 seconds.")
+            time.sleep(5)
 
 def final_summary(question, summaries):
     """Construct a final summary from a list of summaries."""
@@ -73,20 +80,26 @@ def final_summary(question, summaries):
     for i, summary in enumerate(summaries):
         prompt += f"\n{i + 1}. {summary}"
 
-    response = openai.ChatCompletion.create(
-        model=llm_model,
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt},
-        ]
-    )
-
-    return response.choices[0].message.content
+    while True:
+        try:
+            response = openai.ChatCompletion.create(
+                model=openai_model,
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": prompt},
+                ]
+            )
+            return response.choices[0].message.content
+        except openai.error.RateLimitError:
+            print("Rate limit exceeded. Sleeping for 3 seconds.")
+            time.sleep(3)
+        except openai.error.ServiceUnavailableError:
+            print("Service unavailable. Retrying in 5 seconds.")
+            time.sleep(5)
 
 def link(r):
     """Extract the link from a search result."""
     return r['link']
-
 
 def search_results(question):
     """Get search results for a question."""
@@ -97,47 +110,40 @@ def search_results(question):
     })
 
     result = search.get_dict()
-    if 'organic_results' in result:
-        return list(map(link, result['organic_results']))
-    else:
-        print("No organic results found.")
-        return []
-
+    return list(map(link, result['organic_results']))
 
 def print_citations(links, summaries):
     """Print citations for the summaries."""
-    print(colorama.Fore.YELLOW + colorama.Style.BRIGHT + "CITATIONS" + colorama.Style.RESET_ALL)
+    print("CITATIONS")
     num_citations = min(len(links), len(summaries))
     for i in range(num_citations):
-        print("\n", f"[{i + 1}] {links[i]}\n{summaries[i]}\n")
+        print(f"[{i + 1}] {links[i]}\n{summaries[i]}\n")
+
+def scrape_and_summarize(link, question):
+    """Scrape the content of a webpage and summarize it."""
+    webpage_text = scrape(link)
+    summary = summarize(question, webpage_text)
+    return summary
 
 def go(keyphrase=None):
     if keyphrase is None:
-        print(colored("\nWHAT WOULD YOU LIKE ME TO SEARCH?\n", "cyan", attrs=["bold"]))
-        keyphrase = input()
-    print("\n")
-    sys.stdout = open(os.devnull, 'w')  # disable print
-    links = search_results(keyphrase)
-    sys.stdout = sys.__stdout__  # enable print
-    webpages = []
+        keyphrase = input("What would you like me to search?")
+    links = search_results(keyphrase)[:7]  # Limit the number of search results
     summaries = []
 
-    # Display progress bar
-    with tqdm(total=100, desc="Loading", ncols=100, bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} ", unit=" percent") as pbar:
-        for i in range(10):  # Increased from 4 to 10
-            if i < len(links):
-                webpages.append(scrape(links[i]))
-                pbar.update(5)  # Adjusted to accommodate 10 resources
-            time.sleep(0.1)
-            if i < len(webpages):
-                summaries.append(summarize(keyphrase, webpages[i]))
-                pbar.update(5)  # Adjusted to accommodate 10 resources
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future_to_summary = {executor.submit(scrape_and_summarize, link, keyphrase): link for link in links}
+        for i, future in enumerate(concurrent.futures.as_completed(future_to_summary)):
+            summaries.append(future.result())
+            print(f"Step {i+1}: Scraping and summarizing link {i+1}")
 
+    print("Step 9: Generating final summary")
     answer = final_summary(keyphrase, summaries)
-    print(colorama.Fore.YELLOW + colorama.Style.BRIGHT + "\n\nHERE IS THE ANSWER\n" + colorama.Style.RESET_ALL)
-    print(answer, "\n")
-    #print_citations(links, summaries)
 
+    #print("HERE IS THE ANSWER")
+    #print(answer)
+    #print_citations(links, summaries)
+    return answer
 
 if __name__ == "__main__":
     go()
