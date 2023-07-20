@@ -6,4 +6,4 @@ termcolor~=2.3.0
 tqdm~=4.65.0
 google-serp-api
 google-search-results
-langchain
+python-wordpress-xmlrpc

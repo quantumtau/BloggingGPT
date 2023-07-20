@@ -100,7 +100,7 @@ You will be provided with an article title {title}, an article description {arti
 Using these inputs, generate captivating, grammatically correct, and easy-to-read content that is suitable for the respective section.
 Make important parts of the text bold. You can also use quotes and citations.
 The content should engage readers and facilitate their understanding of the blog post's content. Maintain an engaging tone of voice throughout.
-The content should be ready to be copied and pasted directly into Wordpress, without the need for any additional formatting.
+The content should be ready to be copied and pasted directly into Wordpress with Gutenberg formatting, without the need for any additional formatting.
 Remember, your goal is to create a section body that aligns with the provided inputs and is optimized for search engines."""
 
     chunked_output = ""
@@ -140,7 +140,7 @@ You will be provided with an article title {title}, an article description {arti
 Using these inputs, generate captivating, grammatically correct, and easy-to-read content that is suitable for the respective section and subsection.
 Make important parts of the text bold. You can also use quotes and citations.
 The content should engage readers and facilitate their understanding of the blog post's content. Maintain an engaging tone of voice throughout.
-The content should be ready to be copied and pasted directly into Wordpress, without the need for any additional formatting.
+The content should be ready to be copied and pasted directly into Wordpress with Gutenberg formatting, without the need for any additional formatting.
 Remember, your goal is to create a section body and subsection body that align with the provided inputs and are optimized for search engines."""
 
     chunked_output = ""

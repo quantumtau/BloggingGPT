@@ -34,6 +34,9 @@ class Config(metaclass=Singleton):
         self.browserless_api_key = os.getenv("BROWSERLESS_API_KEY")
         self.brave_search_api_key = os.getenv("BRAVE_SEARCH_API_KEY")
         self.wolfram_alpha_appid = os.getenv("WOLFRAM_ALPHA_APPID")
+        self.site_url = os.getenv("SITE_URL")
+        self.wp_admin_username = os.getenv("WP_ADMIN_USERNAME")
+        self.wp_admin_password = os.getenv("WP_ADMIN_PASSWORD")
 
     # Method to set the llm_model attribute
     def set_llm_model(self, value: str):
@@ -58,3 +61,12 @@ class Config(metaclass=Singleton):
     # Method to set the brave_search_api_key attribute
     def set_brave_search_api_key(self, value: str):
         self.brave_search_api_key = value
+
+    def set_site_url(self, value: str):
+        self.site_url = value
+
+    def set_wp_admin_username(self, value: str):
+        self.wp_admin_username = value
+
+    def set_wp_admin_password(self, value: str):
+        self.wp_admin_password = value
