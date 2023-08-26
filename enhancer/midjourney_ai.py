@@ -9,7 +9,7 @@ from PIL import Image
 from io import BytesIO
 
 # Define API key and initialize TNL
-TNL_API_KEY = 'dffc660d-8ad0-4a13-bc91-119e27b8e4a3'
+TNL_API_KEY = ''
 tnl = TNL(TNL_API_KEY)
 
 
