@@ -14,4 +14,4 @@ You need to add your login details for WP to .env and then add details about you
 
 If you want to use Midjorney you need to add 3rd party API key to enhancer/midjourney_ai.py
 
-You can get it at [thenextleg.io](https://www.thenextleg.io/)https://www.thenextleg.io/
+You can get it at [thenextleg.io](https://www.thenextleg.io/)
