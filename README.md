@@ -7,3 +7,7 @@ Without SearchGPT, an article cost is around $1 and +/- 6k words.
 With SearchGPT, an article cost is around $1.5 and +/- 6k words.
 
 If you want to test it, create .env file, add all APIs (you can ignore WOLFRAM_ALPHA_APPID="" for now) and run main.py.
+
+Update 26/08/2023
+
+You need to add your login details for WP to .env and then add details about your blog to blogs/blogs.toml. You can add as many blogs as you want. The app will ask you which one you want to update.
