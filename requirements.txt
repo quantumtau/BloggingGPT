@@ -7,3 +7,4 @@ tqdm~=4.65.0
 google-serp-api
 google-search-results
 python-wordpress-xmlrpc
+toml

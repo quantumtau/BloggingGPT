@@ -24,10 +24,12 @@ except KeyError:
     sys.stderr.write("OpenAI key configuration failed.")
     exit(1)
 
-def propose_niche():
-    input_text = """Your task is to propose a niche that will grow fastest in organic 
+def propose_niche(user_search):
+    input_text = f"""Your task is to propose a niche that will grow fastest in organic 
     results and once the user agrees to the niche, your goal is to propose a name, 
-    domain name and then topics and write articles. Start with proposing the niche."""
+    domain name and then topics and write articles. User has also found the following on Google:
+    '{user_search}'.
+    Start with proposing the niche."""
 
     chunked_output = ""
     for chunk in openai.ChatCompletion.create(
@@ -46,6 +48,3 @@ def propose_niche():
             chunked_output += content
 
     return chunked_output
-
-if __name__ == "__main__":
-    kick_off_openai()

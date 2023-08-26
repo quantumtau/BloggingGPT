@@ -1,16 +1,9 @@
-import os
 import sys
-import time
-import requests
 import openai
-from serpapi import GoogleSearch
 from dotenv import load_dotenv
-from termcolor import colored
-from tqdm import tqdm
 import colorama
 colorama.init(autoreset=True)
 from config import Config
-import json
 import re
 
 from wordpress_xmlrpc import Client, WordPressPost
@@ -60,6 +53,16 @@ def convert_to_gutenberg_blocks(text):
                 # Add the headline as a block
                 blocks.append(create_heading_block(line))
 
+            # Check if the line is a link
+            elif re.search(r"\[(.*?)\]\((.*?)\)", line):
+                # If there's a current paragraph, add it as a block
+                if current_paragraph:
+                    blocks.append(create_paragraph_block(current_paragraph))
+                    current_paragraph = ""
+
+                # Add the link as a block
+                blocks.append(create_link_block(line))
+
             # Otherwise, add the line to the current paragraph
             else:
                 current_paragraph += line
@@ -74,6 +77,11 @@ def convert_to_gutenberg_blocks(text):
 def create_paragraph_block(text):
     # Replace **text** with <strong>text</strong>
     text = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", text)
+    return '<!-- wp:paragraph --><p>{}</p><!-- /wp:paragraph -->'.format(text)
+
+def create_link_block(text):
+    # Replace [text](url) with <a href="url">text</a>
+    text = re.sub(r"\[(.*?)\]\((.*?)\)", r'<a href="\2">\1</a>', text)
     return '<!-- wp:paragraph --><p>{}</p><!-- /wp:paragraph -->'.format(text)
 
 def create_heading_block(text):
@@ -92,6 +100,7 @@ def create_quote_block(text):
     return '<!-- wp:quote --><blockquote>{}</blockquote><!-- /wp:quote -->'.format(text.replace("> ", "").strip())
 
 
+##################### ONLY FOR TESTING #####################
 def post_to_wordpress(title, content, category, tags):
     wp_url = cfg.site_url
     wp_username = cfg.wp_admin_username

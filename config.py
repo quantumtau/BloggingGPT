@@ -29,6 +29,7 @@ class Config(metaclass=Singleton):
         self.llm_model = os.getenv("LLM_MODEL")
         self.fast_llm_model = os.getenv("FAST_LLM_MODEL")
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
+        self.openai_api_key_fast = os.getenv("OPENAI_API_KEY_FAST")
         openai.api_key = self.openai_api_key
         self.serpapi_api_key = os.getenv("SERPAPI_API_KEY")
         self.browserless_api_key = os.getenv("BROWSERLESS_API_KEY")
@@ -49,6 +50,9 @@ class Config(metaclass=Singleton):
     # Method to set the openai_api_key attribute
     def set_openai_api_key(self, value: str):
         self.openai_api_key = value
+
+    def set_openai_api_key_fast(self, value: str):
+        self.openai_api_key_fast = value
 
     # Method to set the serp_api_key attribute
     def set_serpapi_api_key(self, value: str):

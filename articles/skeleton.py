@@ -1,12 +1,6 @@
-import os
 import sys
-import time
-import requests
 import openai
-from serpapi import GoogleSearch
 from dotenv import load_dotenv
-from termcolor import colored
-from tqdm import tqdm
 import colorama
 colorama.init(autoreset=True)
 from config import Config
