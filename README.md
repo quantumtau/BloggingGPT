@@ -15,3 +15,7 @@ You need to add your login details for WP to .env and then add details about you
 If you want to use Midjorney you need to add 3rd party API key to enhancer/midjourney_ai.py
 
 You can get it at [thenextleg.io](https://www.thenextleg.io/)
+
+In blogs.toml, try to add as much info as possible. Long descriptions are better.
+
+Default settings is 15 articles. If you want more in one go, go to orchestrar/blog.py and change the number in prompt. Don't forget to change the prompt for both keywords scenarios.
